@@ -8,8 +8,7 @@
 		"psr-7",
 		"psr-17"
 	],
-	"authors" : [
-		{
+	"authors" : [{
 			"name" : "Maxime Bourmaut"
 		}
 	],
@@ -17,6 +16,9 @@
 		"php" : "^7.1.0",
 		"psr/http-message" : "^1.0",
 		"http-interop/http-factory" : "^0.3"
+	},
+	"require-dev" : {
+		"phpunit/phpunit" : "^7.0"
 	},
 	"provide" : {
 		"psr/http-message-implementation" : "1.0",
@@ -31,5 +33,9 @@
 		"psr-4" : {
 			"Test\\Aidphp\\Http\\" : "test/"
 		}
+	},
+	"scripts" : {
+		"test" : "vendor/bin/phpunit",
+		"test-ci" : "vendor/bin/phpunit --coverage-text --coverage-clover=build/coverage.xml"
 	}
 }
