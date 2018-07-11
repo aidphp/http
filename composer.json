@@ -1,0 +1,35 @@
+{
+	"name" : "aidphp/http",
+	"type" : "library",
+	"description" : "PSR HTTP Message implementations",
+	"license" : "MIT",
+	"keywords" : [
+		"http",
+		"psr-7",
+		"psr-17"
+	],
+	"authors" : [
+		{
+			"name" : "Maxime Bourmaut"
+		}
+	],
+	"require" : {
+		"php" : "^7.1.0",
+		"psr/http-message" : "^1.0",
+		"http-interop/http-factory" : "^0.3"
+	},
+	"provide" : {
+		"psr/http-message-implementation" : "1.0",
+		"psr/http-factory-implementation" : "1.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Aidphp\\Http\\" : "src/"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"Test\\Aidphp\\Http\\" : "test/"
+		}
+	}
+}
