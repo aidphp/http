@@ -104,7 +104,7 @@ class Uri implements UriInterface
     public function withUserInfo($user, $password = null): self
     {
         $info = $user;
-        if ($password)
+        if ('' != $password)
         {
             $info .= ':' . $password;
         }
