@@ -45,7 +45,6 @@ trait MessageTrait
     public function getHeader($header): array
     {
         $header = strtolower($header);
-
         return isset($this->headerNames[$header]) ? $this->headers[$this->headerNames[$header]] : [];
     }
 
@@ -61,16 +60,16 @@ trait MessageTrait
             $value = [$value];
         }
 
-        $normalized = strtolower($header);
+        $key = strtolower($header);
         $new = clone $this;
 
-        if (isset($new->headerNames[$normalized]))
+        if (isset($new->headerNames[$key]))
         {
-            unset($new->headers[$new->headerNames[$normalized]]);
+            unset($new->headers[$new->headerNames[$key]]);
         }
 
-        $new->headerNames[$normalized] = $header;
-        $new->headers[$header] = $value;
+        $new->headerNames[$key] = $header;
+        $new->headers[$header]  = $value;
 
         return $new;
     }
@@ -82,17 +81,17 @@ trait MessageTrait
             $value = [$value];
         }
 
-        $normalized = strtolower($header);
+        $key = strtolower($header);
         $new = clone $this;
 
-        if (isset($new->headerNames[$normalized]))
+        if (isset($new->headerNames[$key]))
         {
-            $header = $this->headerNames[$normalized];
+            $header = $this->headerNames[$key];
             $new->headers[$header] = array_merge($this->headers[$header], $value);
         }
         else
         {
-            $new->headerNames[$normalized] = $header;
+            $new->headerNames[$key] = $header;
             $new->headers[$header] = $value;
         }
 
@@ -101,17 +100,17 @@ trait MessageTrait
 
     public function withoutHeader($header): self
     {
-        $normalized = strtolower($header);
+        $key = strtolower($header);
 
-        if (! isset($this->headerNames[$normalized]))
+        if (! isset($this->headerNames[$key]))
         {
             return $this;
         }
 
-        $header = $this->headerNames[$normalized];
+        $header = $this->headerNames[$key];
 
         $new = clone $this;
-        unset($new->headers[$header], $new->headerNames[$normalized]);
+        unset($new->headers[$header], $new->headerNames[$key]);
 
         return $new;
     }
@@ -145,17 +144,17 @@ trait MessageTrait
                 $value = [$value];
             }
 
-            $normalized = strtolower($header);
+            $key = strtolower($header);
 
-            if (isset($this->headerNames[$normalized]))
+            if (isset($this->headerNames[$key]))
             {
-                $header = $this->headerNames[$normalized];
+                $header = $this->headerNames[$key];
                 $this->headers[$header] = array_merge($this->headers[$header], $value);
             }
             else
             {
-                $this->headerNames[$normalized] = $header;
-                $this->headers[$header] = $value;
+                $this->headerNames[$key] = $header;
+                $this->headers[$header]  = $value;
             }
         }
     }

@@ -218,7 +218,6 @@ class Uri implements UriInterface
     private function parseUri(string $uri): void
     {
         $parts = parse_url($uri);
-
         if (false === $parts)
         {
             throw new InvalidArgumentException('Unable to parse URI');
