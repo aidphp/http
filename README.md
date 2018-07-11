@@ -1,2 +1,2 @@
 # Http
-Http implementation
+PSR-7 implementation
