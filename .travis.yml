@@ -17,7 +17,7 @@ matrix:
   fast_finish: true
   include:
     - php: 7.1
-      env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" COVERAGE=true PHPUNIT_FLAGS="--coverage-clover build/coverage.xml"
+      env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" COVERAGE=true PHPUNIT_FLAGS="--coverage-clover coverage.clover"
 
 before_install:
   - travis_retry composer self-update
@@ -30,4 +30,4 @@ script:
 
 after_success:
   - if [[ "$COVERAGE" = true ]]; then wget https://scrutinizer-ci.com/ocular.phar; fi
-  - if [[ "$COVERAGE" = true ]]; then php ocular.phar code-coverage:upload --format=php-clover build/coverage.xml; fi
+  - if [[ "$COVERAGE" = true ]]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
