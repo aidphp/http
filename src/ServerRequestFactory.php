@@ -9,22 +9,22 @@ use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use InvalidArgumentException;
 
-class ServerRequestFactory
+class ServerRequestFactory implements ServerRequestFactoryInterface
 {
-    public static function createFromGlobals(array $server = null, array $get = null, array $post = null, array $cookies = null, array $files = null): ServerRequestInterface
+    public function createFromGlobals(array $server = null, array $get = null, array $post = null, array $cookies = null, array $files = null): ServerRequestInterface
     {
         $server  = $server ?: $_SERVER;
         $method  = $server['REQUEST_METHOD'] ?? 'GET';
-        $uri     = self::createUriFromGlobals($server);
+        $uri     = $this->createUriFromGlobals($server);
         $headers = function_exists('getallheaders') ? getallheaders() : [];
         $body    = new Stream(fopen('php://input', 'r'));
         $version = isset($server['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $server['SERVER_PROTOCOL']) : '1.1';
-        $files   = self::normalizeFiles($files ?: $_FILES);
+        $files   = $this->normalizeFiles($files ?: $_FILES);
 
         return new ServerRequest($method, $uri, $headers, $body, $version, $server, $get ?: $_GET, $post ?: $_POST, $cookies ?: $_COOKIE, $files);
     }
 
-    private static function createUriFromGlobals(array $server): UriInterface
+    private function createUriFromGlobals(array $server): UriInterface
     {
         $scheme = isset($server['HTTPS']) && 'on' === $server['HTTPS'] ? 'https' : 'http';
         $host   = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? 'localhost';
@@ -44,7 +44,7 @@ class ServerRequestFactory
         return new Uri($scheme . '://' . $host . ':' . $port . $uri);
     }
 
-    private static function normalizeFiles(array $files): array
+    private function normalizeFiles(array $files): array
     {
         $result = [];
         foreach ($files as $key => $value)
@@ -55,11 +55,11 @@ class ServerRequestFactory
             }
             elseif (is_array($value) && isset($value['tmp_name']))
             {
-                $result[$key] = self::createUploadedFileFromSpec($value);
+                $result[$key] = $this->createUploadedFileFromSpec($value);
             }
             elseif (is_array($value))
             {
-                $result[$key] = self::normalizeFiles($value);
+                $result[$key] = $this->normalizeFiles($value);
                 continue;
             }
             else
@@ -71,11 +71,11 @@ class ServerRequestFactory
         return $result;
     }
 
-    private static function createUploadedFileFromSpec(array $value)
+    private function createUploadedFileFromSpec(array $value)
     {
         if (is_array($value['tmp_name']))
         {
-            return self::normalizeNestedFileSpec($value);
+            return $this->normalizeNestedFileSpec($value);
         }
 
         return new UploadedFile(
@@ -87,7 +87,7 @@ class ServerRequestFactory
         );
     }
 
-    private static function normalizeNestedFileSpec(array $files = []): array
+    private function normalizeNestedFileSpec(array $files = []): array
     {
         $result = [];
         foreach (array_keys($files['tmp_name']) as $key)
@@ -100,7 +100,7 @@ class ServerRequestFactory
                 'type'     => $files['type'][$key],
             ];
 
-            $result[$key] = self::createUploadedFileFromSpec($spec);
+            $result[$key] = $this->createUploadedFileFromSpec($spec);
         }
 
         return $result;

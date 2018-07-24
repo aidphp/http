@@ -67,7 +67,7 @@ class ServerRequestFactoryTest extends TestCase
      */
     public function testGetUriFromGlobals($expected, $serverParams)
     {
-        $req = ServerRequestFactory::createFromGlobals($serverParams);
+        $req = (new ServerRequestFactory())->createFromGlobals($serverParams);
         $this->assertEquals(new Uri($expected), $req->getUri());
     }
 
@@ -96,7 +96,7 @@ class ServerRequestFactoryTest extends TestCase
             'files' => new UploadedFile('file.txt', 0, 0, 'foo.bar', 'text/plain')
         ];
 
-        $req = ServerRequestFactory::createFromGlobals($server, $get, $post, $cookies, $files);
+        $req = (new ServerRequestFactory())->createFromGlobals($server, $get, $post, $cookies, $files);
 
         $this->assertInstanceOf(ServerRequest::class, $req);
         $this->assertSame($cookies, $req->getCookieParams());
@@ -357,7 +357,7 @@ class ServerRequestFactoryTest extends TestCase
      */
     public function testGetNormalizeFiles($files, $expected)
     {
-        $req = ServerRequestFactory::createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], $files);
+        $req = (new ServerRequestFactory())->createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], $files);
         $this->assertEquals($expected, $req->getUploadedFiles());
     }
 
@@ -366,6 +366,6 @@ class ServerRequestFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid value in files specification');
 
-        ServerRequestFactory::createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], ['test' => 'something']);
+        (new ServerRequestFactory())->createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], ['test' => 'something']);
     }
 }
