@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Aidphp\Http;
 
+use Interop\Http\PhpServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use InvalidArgumentException;
+use Interop\Http\Factory\ServerRequestFactoryInterface;
 
-class ServerRequestFactory implements ServerRequestFactoryInterface
+class ServerRequestFactory implements ServerRequestFactoryInterface, PhpServerRequestFactoryInterface
 {
-    public function createFromGlobals(array $server = null, array $get = null, array $post = null, array $cookies = null, array $files = null): ServerRequestInterface
+    public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
+    {
+        return new ServerRequest($method, $uri, [], null, '1.1', $serverParams);
+    }
+
+    public function createServerRequestFromGlobals(array $server = null, array $get = null, array $post = null, array $cookies = null, array $files = null): ServerRequestInterface
     {
         $server  = $server ?: $_SERVER;
         $method  = $server['REQUEST_METHOD'] ?? 'GET';

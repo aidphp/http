@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Test\Aidphp\Http;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use Aidphp\Http\ServerRequestFactory;
 use Aidphp\Http\ServerRequest;
 use Aidphp\Http\UploadedFile;
@@ -13,6 +14,67 @@ use InvalidArgumentException;
 
 class ServerRequestFactoryTest extends TestCase
 {
+    public function getMethods()
+    {
+        return [
+            ['GET'],
+            ['POST'],
+            ['PUT'],
+            ['DELETE'],
+            ['OPTIONS'],
+            ['HEAD'],
+        ];
+    }
+
+    public function getServer()
+    {
+        $data = [];
+
+        foreach ($this->getMethods() as $methodData)
+        {
+            $data[] = [
+                [
+                    'REQUEST_METHOD' => $methodData[0],
+                    'REQUEST_URI'    => '/test',
+                    'QUERY_STRING'   => 'foo=1&bar=true',
+                    'HTTP_HOST'      => 'example.org',
+                ]
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @dataProvider getServer
+     */
+    public function testCreateServerRequest(array $server)
+    {
+        $method = $server['REQUEST_METHOD'];
+        $uri = 'http://' . $server['HTTP_HOST'] . $server['REQUEST_URI'] . '?' . $server['QUERY_STRING'];
+        $req = (new ServerRequestFactory())->createServerRequest($method, $uri);
+
+        $this->assertInstanceOf(ServerRequestInterface::class, $req);
+        $this->assertSame($method, $req->getMethod());
+        $this->assertSame($uri, (string) $req->getUri());
+        $this->assertSame([], $req->getServerParams());
+    }
+
+    /**
+     * @dataProvider getServer
+     */
+    public function testCreateServerRequestFromArray(array $server)
+    {
+        $method = $server['REQUEST_METHOD'];
+        $uri = 'http://' . $server['HTTP_HOST'] . $server['REQUEST_URI'] . '?' . $server['QUERY_STRING'];
+        $req = (new ServerRequestFactory())->createServerRequest($method, $uri, $server);
+
+        $this->assertInstanceOf(ServerRequestInterface::class, $req);
+        $this->assertSame($method, $req->getMethod());
+        $this->assertSame($uri, (string) $req->getUri());
+        $this->assertSame($server, $req->getServerParams());
+    }
+
     public function getUriFromGlobals()
     {
         $server = [
@@ -67,7 +129,7 @@ class ServerRequestFactoryTest extends TestCase
      */
     public function testGetUriFromGlobals($expected, $serverParams)
     {
-        $req = (new ServerRequestFactory())->createFromGlobals($serverParams);
+        $req = (new ServerRequestFactory())->createServerRequestFromGlobals($serverParams);
         $this->assertEquals(new Uri($expected), $req->getUri());
     }
 
@@ -96,7 +158,7 @@ class ServerRequestFactoryTest extends TestCase
             'files' => new UploadedFile('file.txt', 0, 0, 'foo.bar', 'text/plain')
         ];
 
-        $req = (new ServerRequestFactory())->createFromGlobals($server, $get, $post, $cookies, $files);
+        $req = (new ServerRequestFactory())->createServerRequestFromGlobals($server, $get, $post, $cookies, $files);
 
         $this->assertInstanceOf(ServerRequest::class, $req);
         $this->assertSame($cookies, $req->getCookieParams());
@@ -357,7 +419,7 @@ class ServerRequestFactoryTest extends TestCase
      */
     public function testGetNormalizeFiles($files, $expected)
     {
-        $req = (new ServerRequestFactory())->createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], $files);
+        $req = (new ServerRequestFactory())->createServerRequestFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], $files);
         $this->assertEquals($expected, $req->getUploadedFiles());
     }
 
@@ -366,6 +428,6 @@ class ServerRequestFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid value in files specification');
 
-        (new ServerRequestFactory())->createFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], ['test' => 'something']);
+        (new ServerRequestFactory())->createServerRequestFromGlobals(['REQUEST_METHOD' => 'POST'], [], [], [], ['test' => 'something']);
     }
 }
