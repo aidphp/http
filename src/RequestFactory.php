@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Aidphp\Http;
 
-use Interop\Http\Factory\RequestFactoryInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 
 class RequestFactory implements RequestFactoryInterface

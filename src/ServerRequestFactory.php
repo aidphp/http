@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Aidphp\Http;
 
+use Psr\Http\Message\ServerRequestFactoryInterface;
 use Interop\Http\PhpServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use InvalidArgumentException;
-use Interop\Http\Factory\ServerRequestFactoryInterface;
 
 class ServerRequestFactory implements ServerRequestFactoryInterface, PhpServerRequestFactoryInterface
 {
